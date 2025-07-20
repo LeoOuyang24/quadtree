@@ -1,0 +1,32 @@
+# depslib dependency file v1.0
+1752971827 source:c:\users\leoou\documents\projects\quadtree\main.cpp
+	"raylib.h"
+	"tree.h"
+
+1741313965 c:\users\leoou\documents\projects\raylib-5.5_win64_mingw-w64\include\raylib.h
+	<stdarg.h>
+	<stdbool.h>
+
+1751600993 source:c:\users\leoou\documents\projects\quadtree\thing.cpp
+
+1752968974 c:\users\leoou\documents\projects\quadtree\tree.h
+	<memory>
+	<vector>
+	<iostream>
+	<unordered_map>
+	<raylib.h>
+	<raymath.h>
+
+1741313965 c:\users\leoou\documents\projects\raylib-5.5_win64_mingw-w64\include\raymath.h
+	<math.h>
+
+1752969472 source:c:\users\leoou\documents\projects\quadtree\grid.cpp
+	"grid.h"
+
+1752969412 c:\users\leoou\documents\projects\quadtree\grid.h
+	<list>
+	<iterator>
+	<memory>
+	<vector>
+	<raylib.h>
+
