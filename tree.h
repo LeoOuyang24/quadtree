@@ -146,9 +146,6 @@ class QuadTree
         //int index = 0; //index in masterList of the Thing this element represents
         Thing* index = 0;
         int next = -1; //index of next element in "elements" that belongs to the same node. -1 means end of the road
-        int prev = -1; //index of previous element,negative means that this element is the first element of a node
-        int node = 0; //index of the node that we are a part of
-        int nextCopy = -1; //index of next element in "elements" that points to the Thing, -1 means end of the road
     };
 
     struct MasterListEntry
@@ -162,7 +159,7 @@ class QuadTree
         }
     };
 
-    std::unordered_map<Thing*,MasterListEntry> masterList;
+    std::unordered_map<Thing*,std::shared_ptr<Thing>> masterList;
     SmartVector<Node> nodes;
     SmartVector<Element> elements;
 
@@ -240,27 +237,22 @@ class QuadTree
     //move an existing element to a node
     void moveElement(int index, int elemIndex)
     {
-        if (nodes[index].getStart() != -1)
-        {
-            elements[nodes[index].getStart()].prev = elemIndex; //set previous start's prev to new element
-        }
+
         elements[elemIndex].next = nodes[index].getStart(); //set the next of new element = the old start
-        elements[elemIndex].node = index;
-        elements[elemIndex].prev = -1;
         nodes[index].setStart(elemIndex); //set the start = the new element
         nodes[index].addToSize(1);
     }
 
-    void add(std::shared_ptr<Thing>& smartPtr, int index, Rectangle rect, MasterListEntry& entry, int depth)
+    void add(std::shared_ptr<Thing>& smartPtr, int index, Rectangle rect, int depth)
     {
         if (!nodes[index].isLeaf())
         {
-            forEachChild([this,&smartPtr,&entry,depth](int nodeIndex,const Rectangle& nodeRect){
+            forEachChild([this,&smartPtr,depth](int nodeIndex,const Rectangle& nodeRect){
 
                         Node& child = nodes[nodeIndex];
                         if (smartPtr->collidesWith(nodeRect))
                         {
-                            add(smartPtr,nodeIndex,nodeRect,entry, depth + 1);
+                            add(smartPtr,nodeIndex,nodeRect, depth + 1);
                         }
                          },index,rect);
 
@@ -269,9 +261,7 @@ class QuadTree
         else if (smartPtr->collidesWith(rect))
         {
             int elemIndex = elements.add({smartPtr.get()});
-            elements[elemIndex].nextCopy = entry.next;
 
-            entry.next = elemIndex;
             moveElement(index,elemIndex);
 
                 //    std::cout << nodes[index].getSize() << " " << index << "\n";
@@ -289,13 +279,11 @@ class QuadTree
                     bool added = false;
                     int next = elements[start].next;
                     forEachChild([this,&added,&start](int nodeIndex, const Rectangle& nodeRect){
-                                 MasterListEntry& entry = masterList[elements[start].index];
-                                 if (entry->collidesWith(nodeRect))
+                                 if (masterList[elements[start].index]->collidesWith(nodeRect))
                                  {
                                      if (added) //if this element overlaps with two or more children, create a new element
                                      {
-                                        int index = elements.add({elements[start].index,-1,entry.next});
-                                        entry.next = index;
+                                        int index = elements.add({elements[start].index,-1});
                                         moveElement(nodeIndex,index);
                                      }
                                      else //if this element is being added to a child for the first time, just move it from the parent
@@ -322,8 +310,8 @@ public:
        // masterList.push_back(entry);
         if (smartPtr.get() && smartPtr->collidesWith(area))
         {
-            masterList[smartPtr.get()] = {smartPtr};
-            add(smartPtr,0,area,masterList[smartPtr.get()],0);
+            masterList[smartPtr.get()] = smartPtr;
+            add(smartPtr,0,area,0);
         }
     }
     void clear()
@@ -335,27 +323,31 @@ public:
         auto it = masterList.find(&ptr);
         if (it != masterList.end())
         {
-            int next = masterList[&ptr].next;
+            penetrate(ptr,0,area,[&ptr,this](int nodeIndex, const Rectangle& rect){
+
+            int next = nodes[nodeIndex].getStart();
+            int prev = -1;
             while(next != -1)
             {
-                int old = elements[next].nextCopy;
-                if (elements[next].prev >= 0)
+                if (elements[next].index == &ptr)
                 {
-                    elements[elements[next].prev].next = elements[next].next;
+                    if (prev == -1)
+                    {
+                        nodes[nodeIndex].setStart(elements[next].next);
+                    }
+                    else
+                    {
+                        elements[prev].next = elements[next].next;
+                    }
+                    nodes[nodeIndex].addToSize(-1);
+                    break;
                 }
-                else //prev is negative, element is the start of the node
-                {
-                    nodes[elements[next].node].setStart(elements[next].next);
-                }
-                if (elements[next].next != -1)
-                {
-                    elements[elements[next].next].prev = elements[next].prev;
-                }
-                nodes[elements[next].node].addToSize(-1);
-                //std::cout << nodes[elements[next].node].getStart()<< " " << elements[next].prev << " " <<elements[next].next << "\n";
-                elements.erase(next);
-                next = old;
+                prev = next;
+                next = elements[next].next;
             }
+
+                      });
+
             /*std::cout << "HELLO\n";
             std::cout << (masterList.find(&ptr) != masterList.end()) << "\n";
             std::cout <<  &ptr << " " << masterList[&ptr].ptr.get()<< "\n";*/

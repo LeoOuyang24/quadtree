@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1752971827 source:c:\users\leoou\documents\projects\quadtree\main.cpp
+1753504346 source:c:\users\leoou\documents\projects\quadtree\main.cpp
 	"raylib.h"
 	"tree.h"
 
@@ -9,7 +9,7 @@
 
 1751600993 source:c:\users\leoou\documents\projects\quadtree\thing.cpp
 
-1752968974 c:\users\leoou\documents\projects\quadtree\tree.h
+1753504843 c:\users\leoou\documents\projects\quadtree\tree.h
 	<memory>
 	<vector>
 	<iostream>

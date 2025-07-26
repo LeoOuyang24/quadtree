@@ -35,14 +35,14 @@ int main()
     SetTargetFPS(60);
     //--------------------------------------------------------------------------------------
 
-    QuadTree<Circle,10,5> tree({0,0,screenWidth,screenHeight});
+    QuadTree<Circle,100,5> tree({0,0,screenWidth,screenHeight});
 
     std::vector<std::shared_ptr<Circle>> circles;
 
     for (int i = 0; i < 10000; i ++)
     {
         Circle::count ++;
-        circles.emplace_back(new Circle({rand()%screenWidth,rand()%screenHeight},5,{rand()%100 - 50/50.0,rand()%100 - 50/50.0},Circle::count,Color(rand()%255,rand()%255,rand()%255,255)));
+        circles.emplace_back(new Circle({rand()%screenWidth,rand()%screenHeight},10,{rand()%100 - 50/50.0,rand()%100 - 50/50.0},Circle::count,Color(rand()%255,rand()%255,rand()%255,255)));
         //tree.add(circles[circles.size()-1]);
         //masterList[circles[circles.size() - 1].get()] = circles[circles.size() - 1];
     }
