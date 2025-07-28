@@ -18,6 +18,8 @@
 #include "raylib.h"
 
 #include "tree.h"
+#include "grid.h"
+
 
 
 int main()
@@ -36,6 +38,7 @@ int main()
     //--------------------------------------------------------------------------------------
 
     QuadTree<Circle,100,5> tree({0,0,screenWidth,screenHeight});
+    Grid<Circle,100,static_cast<int>(ceil(screenWidth/100.0f)),{0,0}> grid;
 
     std::vector<std::shared_ptr<Circle>> circles;
 
@@ -44,7 +47,6 @@ int main()
         Circle::count ++;
         circles.emplace_back(new Circle({rand()%screenWidth,rand()%screenHeight},10,{rand()%100 - 50/50.0,rand()%100 - 50/50.0},Circle::count,Color(rand()%255,rand()%255,rand()%255,255)));
         //tree.add(circles[circles.size()-1]);
-        //masterList[circles[circles.size() - 1].get()] = circles[circles.size() - 1];
     }
 
 
@@ -60,7 +62,8 @@ int main()
         {
             Circle::count ++;
             circles.emplace_back(new Circle(GetMousePosition(),10,{rand()%100 - 50/50.0,rand()%100 - 50/50.0},Circle::count,RED));
-            tree.add(circles[circles.size()-1]);
+            //tree.add(circles[circles.size()-1]);
+            grid.add(circles[circles.size()-1]);
             std::cout << "CIRCLES: " << circles.size() << "\n";
 
         }
@@ -88,16 +91,14 @@ int main()
             ClearBackground(RAYWHITE);
         for (int i = 0; i < circles.size(); i ++)
         {
-            tree.remove(*circles[i].get());
-
+            //tree.remove(*circles[i].get());
+            grid.remove(*circles[i].get());
 
             circles[i]->update();
             DrawPoly(circles[i]->pos,6,circles[i]->radius,0,circles[i]->color);
-            //DrawCircle(circles[i]->pos.x,circles[i]->pos.y,circles[i]->radius,RED);
-            tree.add(circles[i]);
+            grid.add(circles[i]);
 
-
-            tree.forEachNearest(circles[i]->pos,circles[i]->radius,[self=circles[i].get()](Circle& thing){
+            grid.forEachNearest(circles[i]->pos,circles[i]->radius,[self=circles[i].get()](Circle& thing){
                                 if (self != &thing)
                                 {
                                     self->color = thing.color;
@@ -106,7 +107,23 @@ int main()
 
                                 });
 
+            //DrawCircle(circles[i]->pos.x,circles[i]->pos.y,circles[i]->radius,RED);
+            //tree.add(circles[i]);
+
+
+
+            /*tree.forEachNearest(circles[i]->pos,circles[i]->radius,[self=circles[i].get()](Circle& thing){
+                                if (self != &thing)
+                                {
+                                    self->color = thing.color;
+                                    //self->dir = Vector2Normalize(thing.pos - self->pos)*-10;
+                                }
+
+                                });*/
+
         }
+        //grid.debug();
+
             //tree.renderElements();
             //tree.render();
             DrawFPS(10,10);
