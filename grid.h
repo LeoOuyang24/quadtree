@@ -151,7 +151,7 @@ public:
         //std::cout << nodes.size() <<" " << maxWidth << " " << maxHeight << " "<< "\n";
         for (int i = 0; i < maxWidth+1; i ++)
         {
-            DrawLine(i*nodeDimen,origin.y,i*nodeDimen,origin.y + (maxHeight -1 + (i <= overHang ))*nodeDimen ,BLACK);
+            DrawLine(i*nodeDimen,origin.y,i*nodeDimen,origin.y + (maxHeight + (i <= overHang ))*nodeDimen ,BLACK);
         }
         for (int i = 0; i < maxHeight+1; i ++)
         {
@@ -163,15 +163,9 @@ public:
             Vector2 pos = indexToPos(i);
             int next = nodes[i];
             int count = 0;
-            bool pressed = (IsKeyPressed(KEY_SPACE));
             while (next != -1)
             {
                 count ++;
-                if (pressed)
-                {
-                    std::cout << next << " ";
-                    std::cout <<  elements[next].ptr << "\n";
-                }
 
                 next = elements[next].next;
             }

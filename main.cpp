@@ -27,11 +27,6 @@ int main()
     // Initialization
     //--------------------------------------------------------------------------------------
 
-
-    size_t seed = 1752944409;//time(NULL);
-    srand(seed);
-    std::cout << "SEED: " << seed << "\n";
-
     InitWindow(screenWidth, screenHeight, "raylib [core] example - basic window");
 
     SetTargetFPS(60);
@@ -45,10 +40,11 @@ int main()
     for (int i = 0; i < 10000; i ++)
     {
         Circle::count ++;
-        circles.emplace_back(new Circle({rand()%screenWidth,rand()%screenHeight},10,{rand()%100 - 50/50.0,rand()%100 - 50/50.0},Circle::count,Color(rand()%255,rand()%255,rand()%255,255)));
+        circles.emplace_back(new Circle({rand()%screenWidth,rand()%screenHeight},5,{rand()%100 - 50/50.0,rand()%100 - 50/50.0},Circle::count,Color(rand()%255,rand()%255,rand()%255,255)));
         //tree.add(circles[circles.size()-1]);
     }
 
+    bool debug = false;
 
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
@@ -82,6 +78,10 @@ int main()
 
         }
 
+        if (IsKeyPressed(KEY_SPACE))
+        {
+            debug = !debug;
+        }
 
         // Draw
         //----------------------------------------------------------------------------------
@@ -91,8 +91,8 @@ int main()
             ClearBackground(RAYWHITE);
         for (int i = 0; i < circles.size(); i ++)
         {
-            //tree.remove(*circles[i].get());
-            grid.remove(*circles[i].get());
+           // tree.remove(*circles[i].get());
+           grid.remove(*circles[i].get());
 
             circles[i]->update();
             DrawPoly(circles[i]->pos,6,circles[i]->radius,0,circles[i]->color);
@@ -122,7 +122,10 @@ int main()
                                 });*/
 
         }
-        //grid.debug();
+        if (debug)
+        {
+            grid.debug();
+        }
 
             //tree.renderElements();
             //tree.render();
